@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/semho/microservice_chat/auth/pkg/auth_v1;auth_v1";
+
+service AuthV1 {
+  rpc Create(CreateRequest) returns (CreateResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
+
+enum Role {
+  user = 0;
+  admin = 1;
+}
+
+message UserPassword {
+  string password = 1;
+  string password_confirm = 2;
+}
+
+message UserDetail {
+  string name = 1;
+  string email = 2;
+  optional Role role = 3;
+}
+
+message User {
+  int64 id = 1;
+  UserDetail detail = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message UpdateUserInfo {
+  google.protobuf.StringValue name = 1;
+  google.protobuf.StringValue email = 2;
+}
+
+message CreateRequest {
+  UserDetail detail = 1;
+  UserPassword password = 2;
+}
+
+message CreateResponse {
+  int64 id = 1;
+}
+
+message GetRequest {
+  int64 id = 1;
+}
+
+message GetResponse {
+  User user = 1;
+}
+
+message UpdateRequest {
+  int64 id = 1;
+  UpdateUserInfo info = 2;
+}
+
+message DeleteRequest {
+  int64 id = 1;
+}
