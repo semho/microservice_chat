@@ -34,6 +34,14 @@ message UserDetail {
 message User {
   int64 id = 1;
   UserDetail detail = 2;
+  UserPassword password = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message UserResponse{
+  int64 id = 1;
+  UserDetail detail = 2;
   google.protobuf.Timestamp created_at = 3;
   google.protobuf.Timestamp updated_at = 4;
 }
@@ -57,7 +65,7 @@ message GetRequest {
 }
 
 message GetResponse {
-  User user = 1;
+  UserResponse user = 1;
 }
 
 message UpdateRequest {
