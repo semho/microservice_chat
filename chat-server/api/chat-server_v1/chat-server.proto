@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package chat_server_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/semho/microservice_chat/chat-server/pkg/chat_server_v1;chat_server_v1";
+
+service ChatServerV1 {
+  rpc CreateChat(CreateChatRequest) returns (CreateChatResponse);
+  rpc DeleteChat(DeleteRequest) returns (google.protobuf.Empty);
+  rpc SendMessage(SendMessageRequest) returns (google.protobuf.Empty);
+}
+
+message User {
+  string name = 1;
+}
+
+message Chat {
+  int64 id = 1;
+  repeated User usernames = 2;
+}
+
+message CreateChatRequest {
+  repeated User usernames = 1;
+}
+
+message CreateChatResponse {
+  int64 id = 1;
+}
+
+message DeleteRequest {
+  int64 id = 1;
+}
+
+message SendMessageRequest {
+  string from = 2;
+  string text = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
