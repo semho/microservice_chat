@@ -1,0 +1,36 @@
+version: '3.7'
+
+volumes:
+  pg_vol_auth:
+  pg_vol_chat-server:
+
+services:
+  pg-auth:
+    image: postgres:16-alpine
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_AUTH}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    ports:
+      - "${PG_PORT_AUTH}:5432"
+    volumes:
+      - pg_vol_auth:/var/lib/postgresql/data
+
+  pg-chat-server:
+    image: postgres:16-alpine
+    environment:
+      - "POSTGRES_DB=${PG_DATABASE_CHAT_SERVER}"
+      - "POSTGRES_USER=${PG_USER}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+    ports:
+      - "${PG_PORT_CHAT_SERVER}:5432"
+    volumes:
+      - pg_vol_chat-server:/var/lib/postgresql/data
+
+#  migrator:
+#    build:
+#      context: ..
+#      dockerfile: migration.Dockerfile
+#    restart: on-failure
+#    environment:
+#      DB_HOST: pg-auth pg-chat-server
