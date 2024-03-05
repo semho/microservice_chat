@@ -12,3 +12,11 @@ func Load(path string) error {
 
 	return nil
 }
+
+type GRPCConfig interface {
+	Address() string
+}
+
+type PGConfig interface {
+	DSN() string
+}
