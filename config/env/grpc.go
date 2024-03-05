@@ -10,8 +10,9 @@ import (
 var _ config.GRPCConfig = (*grpcConfig)(nil)
 
 const (
-	grpcHostEnvName = "HOST"
-	grpcPortEnvName = "PORT"
+	grpcHostEnvName       = "HOST"
+	GrpcPortEnvAuth       = "PORT_AUTH"
+	GrpcPortEnvChatServer = "PORT_CHAT_SERVER"
 )
 
 type grpcConfig struct {
@@ -19,12 +20,12 @@ type grpcConfig struct {
 	port string
 }
 
-func NewGRPCConfig() (*grpcConfig, error) {
+func NewGRPCConfig(portEnvName string) (*grpcConfig, error) {
 	host := os.Getenv(grpcHostEnvName)
 	if len(host) == 0 {
 		return nil, errors.New("grpc host not found")
 	}
-	port := os.Getenv(grpcPortEnvName)
+	port := os.Getenv(portEnvName)
 	if len(port) == 0 {
 		return nil, errors.New("grpc port not found")
 	}
