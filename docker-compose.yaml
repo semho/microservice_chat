@@ -29,7 +29,7 @@ services:
 
 #  migrator:
 #    build:
-#      context: ..
+#      context: .
 #      dockerfile: migration.Dockerfile
 #    restart: on-failure
 #    environment:

@@ -4,21 +4,21 @@ LOCAL_BIN:=$(CURDIR)/bin
 
 LOCAL_MIGRATION_AUTH=$(MIGRATION_AUTH)
 LOCAL_MIGRATION_CHAT_SERVER=$(MIGRATION_CHAT_SERVER)
-LOCAL_MIGRATION_AUTH_DNS="host=localhost port=$(PG_PORT_AUTH) dbname=$(PG_DATABASE_AUTH) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
-LOCAL_MIGRATION_CHAT_SERVER_DNS="host=localhost port=$(PG_PORT_CHAT_SERVER) dbname=$(PG_DATABASE_CHAT_SERVER) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
+LOCAL_MIGRATION_AUTH_DSN="host=localhost port=$(PG_PORT_AUTH) dbname=$(PG_DATABASE_AUTH) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
+LOCAL_MIGRATION_CHAT_SERVER_DSN="host=localhost port=$(PG_PORT_CHAT_SERVER) dbname=$(PG_DATABASE_CHAT_SERVER) user=$(PG_USER) password=$(PG_PASSWORD) sslmode=disable"
 
 local-migration-status:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DNS} status -v
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DNS} status -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DSN} status -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DSN} status -v
 
 local-migration-up:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DNS} up -v
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DNS} up -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DSN} up -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DSN} up -v
 
 local-migration-down-auth:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DNS} down -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_AUTH} postgres ${LOCAL_MIGRATION_AUTH_DSN} down -v
 local-migration-down-chat-server:
-	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DNS} down -v
+	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_CHAT_SERVER} postgres ${LOCAL_MIGRATION_CHAT_SERVER_DSN} down -v
 
 install-golangci-lint:
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3

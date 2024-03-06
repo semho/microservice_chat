@@ -4,3 +4,6 @@
 /auth/bin/
 
 .env
+vendor
+auth/vendor
+chat-server/vendor
