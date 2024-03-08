@@ -1,31 +1,19 @@
-package main
+package test
 
 import (
 	"context"
-	"flag"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	desc "github.com/semho/microservice_chat/chat-server/pkg/chat-server_v1"
-	"github.com/semho/microservice_chat/config"
-	"github.com/semho/microservice_chat/config/env"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"log"
-	"net"
 )
 
-var configPath string
-
-func init() {
-	flag.StringVar(&configPath, "config-path", "../../../.env.local", "path to config file")
-}
-
-type server struct {
+type Server struct {
 	desc.UnimplementedChatServerV1Server
-	pool *pgxpool.Pool
+	Pool *pgxpool.Pool
 }
 
 var internalServerError = status.Error(codes.Internal, "Internal server error")
@@ -35,9 +23,9 @@ func checkError(msg string, err error) error {
 	return internalServerError
 }
 
-func (s *server) userExists(ctx context.Context, userName string) (bool, error) {
+func (s *Server) userExists(ctx context.Context, userName string) (bool, error) {
 	var exists bool
-	err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "chat-server".public.users  WHERE name = $1)`,
+	err := s.Pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "chat-server".public.users  WHERE name = $1)`,
 		userName).Scan(&exists)
 	if err != nil {
 		return false, err
@@ -45,9 +33,9 @@ func (s *server) userExists(ctx context.Context, userName string) (bool, error) 
 	return exists, nil
 }
 
-func (s *server) chatExists(ctx context.Context, chatID int64) (bool, error) {
+func (s *Server) chatExists(ctx context.Context, chatID int64) (bool, error) {
 	var exists bool
-	err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "chat-server".public.chats  WHERE id = $1)`,
+	err := s.Pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "chat-server".public.chats  WHERE id = $1)`,
 		chatID).Scan(&exists)
 	if err != nil {
 		return false, err
@@ -55,13 +43,13 @@ func (s *server) chatExists(ctx context.Context, chatID int64) (bool, error) {
 	return exists, nil
 }
 
-func (s *server) CreateChat(ctx context.Context, req *desc.CreateChatRequest) (*desc.CreateChatResponse, error) {
+func (s *Server) CreateChat(ctx context.Context, req *desc.CreateChatRequest) (*desc.CreateChatResponse, error) {
 	if req.GetUsernames() == nil {
 		return nil, status.Error(codes.InvalidArgument, "Invalid request: UserNames must be provided")
 	}
 	log.Printf("User names: %+v", req.GetUsernames())
 
-	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{
 		IsoLevel:       pgx.ReadCommitted,
 		AccessMode:     pgx.ReadWrite,
 		DeferrableMode: pgx.NotDeferrable,
@@ -123,7 +111,7 @@ func (s *server) CreateChat(ctx context.Context, req *desc.CreateChatRequest) (*
 	return response, nil
 }
 
-func (s *server) DeleteChat(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+func (s *Server) DeleteChat(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "Invalid request: Id must be provided")
 	}
@@ -138,7 +126,7 @@ func (s *server) DeleteChat(ctx context.Context, req *desc.DeleteRequest) (*empt
 
 	log.Printf("delete chat by id: %d", req.GetId())
 
-	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{
 		IsoLevel:       pgx.ReadCommitted,
 		AccessMode:     pgx.ReadWrite,
 		DeferrableMode: pgx.NotDeferrable,
@@ -170,11 +158,11 @@ func (s *server) DeleteChat(ctx context.Context, req *desc.DeleteRequest) (*empt
 	return &emptypb.Empty{}, nil
 }
 
-func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
+func (s *Server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) (*emptypb.Empty, error) {
 	if req.GetFrom() == "" || req.GetText() == "" {
 		return nil, status.Error(codes.InvalidArgument, "Invalid request: From or Text must be provided")
 	}
-	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{
 		IsoLevel:       pgx.ReadCommitted,
 		AccessMode:     pgx.ReadWrite,
 		DeferrableMode: pgx.NotDeferrable,
@@ -221,45 +209,4 @@ func (s *server) SendMessage(ctx context.Context, req *desc.SendMessageRequest) 
 	log.Printf("New message: %+v", newMessage)
 
 	return &emptypb.Empty{}, nil
-}
-
-func main() {
-	flag.Parse()
-	ctx := context.Background()
-
-	err := config.Load(configPath)
-	if err != nil {
-		log.Fatalf("failed to load config: %s", err)
-	}
-
-	grpcConfig, err := env.NewGRPCConfig(env.GrpcPortEnvChatServer)
-	if err != nil {
-		log.Fatalf("failed to get grpc config: %v", err)
-	}
-
-	pgConfig, err := env.NewPGConfig(env.DSNEnvChatServer)
-	if err != nil {
-		log.Fatalf("failed to get pg config: %v", err)
-	}
-
-	lis, err := net.Listen("tcp", grpcConfig.Address())
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	pool, err := pgxpool.Connect(ctx, pgConfig.DSN())
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	defer pool.Close()
-
-	s := grpc.NewServer()
-	reflection.Register(s)
-	desc.RegisterChatServerV1Server(s, &server{pool: pool})
-
-	log.Printf("server listening at: %v", lis.Addr())
-
-	if err = s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
 }
