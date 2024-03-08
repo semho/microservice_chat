@@ -1,0 +1,33 @@
+version: '3.7'
+
+volumes:
+  pg_vol_auth:
+  pg_vol_chat-server:
+
+services:
+  pg-auth-local:
+    image: postgres:16-alpine
+    env_file:
+      - ./.env.local
+    ports:
+      - "${PG_PORT_AUTH}:5432"
+    volumes:
+      - pg_vol_auth:/var/lib/postgresql/data
+
+  pg-chat-server-local:
+    image: postgres:16-alpine
+    env_file:
+      - ./.env.local
+    ports:
+      - "${PG_PORT_CHAT_SERVER}:5432"
+    volumes:
+      - pg_vol_chat-server:/var/lib/postgresql/data
+
+  migrator-local:
+    build:
+      context: .
+      dockerfile: migration_local.Dockerfile
+    restart: on-failure
+    depends_on:
+      - pg-auth-local
+      - pg-chat-server-local

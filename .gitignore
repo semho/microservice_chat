@@ -4,6 +4,8 @@
 /auth/bin/
 
 .env
+.env.local
+.env.prod
 vendor
 auth/vendor
 chat-server/vendor
