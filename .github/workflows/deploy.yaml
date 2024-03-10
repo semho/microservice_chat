@@ -119,5 +119,5 @@ jobs:
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
               
-              scp -v prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              scp -v prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh root@31.129.51.22:
             fi
