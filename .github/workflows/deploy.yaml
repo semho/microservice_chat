@@ -112,7 +112,8 @@ jobs:
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
               
-              echo ${{ secrets.SSH_KEY }} > /tmp/id_rsa
-              chmod 400 /tmp/id_rsa
-              scp -v -i /tmp/id_rsa prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              mkdir -p ~/.ssh
+              echo ${{ secrets.SSH_KEY }} >> ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
+              scp -v -i ~/.ssh/id_rsa prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             fi
