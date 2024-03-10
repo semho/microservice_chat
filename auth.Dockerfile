@@ -1,7 +1,6 @@
 FROM golang:1.21.8-alpine AS builder
 
 COPY ./auth /github.com/semho/microservice_chat/auth
-COPY ./bin /github.com/semho/microservice_chat/auth/bin
 WORKDIR /github.com/semho/microservice_chat/auth
 
 RUN go mod download

@@ -1,7 +1,6 @@
 FROM golang:1.21.8-alpine AS builder
 
 COPY ./chat-server /github.com/semho/microservice_chat/chat-server
-COPY ./bin /github.com/semho/microservice_chat/chat-server/bin
 WORKDIR /github.com/semho/microservice_chat/chat-server
 
 RUN go mod download
