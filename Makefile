@@ -1,4 +1,4 @@
-include .env
+include .env.local
 
 LOCAL_BIN:=$(CURDIR)/bin
 
@@ -56,3 +56,20 @@ generate-chat-server-api:
     	--go-grpc_out=chat-server/pkg/chat-server_v1 --go-grpc_opt=paths=source_relative \
     	--plugin=protoc-gen-go-grpc=./bin/protoc-gen-go-grpc \
     	chat-server/api/chat-server_v1/chat-server.proto
+
+build:
+	cd ./auth/cmd/server/ && GOOS=linux GOARCH=amd64 go build -o ../../../service_auth main.go \
+	&& cd ../../../ && cd ./chat-server/cmd/server/ && GOOS=linux GOARCH=amd64 go build -o ../../../service_chat_server main.go
+
+copy-to-server:
+	scp -i ~/.ssh/id_rsa_selectel ./service_auth ./service_chat_server ./.env.local root@31.129.51.22:
+
+docker-build-and-push-auth:
+	docker buildx build --no-cache --platform linux/amd64 -t $(REGESTRY)/auth:v0.0.1 -f auth.Dockerfile .
+	docker login -u $(USERNAME) -p $(PASSWORD) $(REGESTRY)
+	docker push $(REGESTRY)/auth:v0.0.1
+
+docker-build-and-push-chat-server:
+	docker buildx build --no-cache --platform linux/amd64 -t $(REGESTRY)/chat-server:v0.0.1 -f chat-server.Dockerfile .
+	docker login -u $(USERNAME) -p $(PASSWORD) $(REGESTRY)
+	docker push $(REGESTRY)/chat-server:v0.0.1
