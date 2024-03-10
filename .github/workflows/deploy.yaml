@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
-          scripts: |
+          script: |
             # Set up variables
             TAG_NAME1=$(echo $GITHUB_SHA | head -c7)
             TAG_NAME2=$(echo $GITHUB_SHA | head -c7)
