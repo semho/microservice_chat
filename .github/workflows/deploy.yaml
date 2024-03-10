@@ -25,7 +25,7 @@ jobs:
       - name: upload artifact docker-compose
         uses: actions/upload-artifact@v4
         with:
-          name: prod.docker-compose.yaml
+          name: docker_compose
           path: prod.docker-compose.yaml
           retention-days: 1
           if-no-files-found: error
@@ -33,7 +33,7 @@ jobs:
       - name: upload artifact migration Dockerfile
         uses: actions/upload-artifact@v4
         with:
-          name: migration_prod.Dockerfile
+          name: dockerfile
           path: migration_prod.Dockerfile
           retention-days: 1
           if-no-files-found: error
@@ -41,7 +41,7 @@ jobs:
       - name: upload artifact migration_prod.sh
         uses: actions/upload-artifact@v4
         with:
-          name: migration_prod.sh
+          name: migration
           path: migration_prod.sh
           retention-days: 1
           if-no-files-found: error
@@ -116,5 +116,5 @@ jobs:
             
               ls -la
               
-              scp -i key artifacts/prod.docker-compose.yml artifacts/migration_prod.Dockerfile artifacts/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              scp -i key docker_compose/prod.docker-compose.yml dockerfile/migration_prod.Dockerfile migration/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             fi
