@@ -72,11 +72,16 @@ jobs:
             if docker ps | grep -q $CONTAINER_NAME_1; then
               echo "Docker Compose уже запущен, выполняем развертывание"
               # Run a new containers from a new image
-              docker-compose up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
-              docker-compose up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+              docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
             else
               echo "Docker Compose не запущен, запускаем его и выполняем развертывание"
               # Запускаем Docker Compose и выполняем шаги развертывания        
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
-              docker compose --env-file .env.prod -f prod.docker-compose.yaml up --build
+              
+              scp prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/docker-compose.yml
+              scp migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/migration_prod.Dockerfile
+              scp migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/migration_prod.sh
+            
+              docker compose --env-file .env.prod up --build
