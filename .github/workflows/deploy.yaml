@@ -92,7 +92,7 @@ jobs:
         run: ls -la /home/runner/work/microservice_chat/microservice_chat/docker_compose/
       - name: Check if docker-compose.yml exists
         run: |
-          if [ ! -f "docker_compose/prod.docker-compose.yml" ]; then
+          if [ ! -f "/home/runner/work/microservice_chat/microservice_chat/docker-compose/prod.docker-compose.yml" ]; then
             echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден в скачанных артефактах!"
             exit 1
           fi
