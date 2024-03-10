@@ -82,10 +82,6 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - run: 'echo "$SSH_KEY" > key'
-        shell: bash
-        env:
-          SSH_KEY: ${{secrets.SSH_KEY}}
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -117,5 +113,5 @@ jobs:
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
               ls -la
               
-              scp -v -i key prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh root@31.129.51.22:
+              scp -v -i key prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh username@host:
             fi
