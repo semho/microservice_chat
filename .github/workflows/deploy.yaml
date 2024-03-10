@@ -82,6 +82,10 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
+      - name: Create SSH directory and known_hosts file
+        run: |
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
       - name: Add server key to known_hosts
         run: |
           echo "${{ secrets.SERVER_PUBLIC_KEY }}" >> ~/.ssh/known_hosts
