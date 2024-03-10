@@ -73,8 +73,8 @@ jobs:
               docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
             
               # Run a new containers from a new image
-              docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
-              docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
             else
               echo "Docker Compose не запущен, запускаем его и выполняем развертывание"
               # Запускаем Docker Compose и выполняем шаги развертывания        
@@ -83,8 +83,8 @@ jobs:
               
               echo ${{ secrets.SSH_KEY }} > /tmp/id_rsa
               chmod 400 /tmp/id_rsa
-              scp -v -i /tmp/id_rsa prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/docker-compose.yml
-              scp -v -i /tmp/id_rsa migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/migration_prod.Dockerfile
-              scp -v -i /tmp/id_rsa migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/migration_prod.sh
+              scp -v -i /tmp/id_rsa prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              scp -v -i /tmp/id_rsa migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              scp -v -i /tmp/id_rsa migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             
-              docker compose --env-file .env.prod up
+              docker compose --env-file .env.prod -f prod.docker-compose.yaml up
