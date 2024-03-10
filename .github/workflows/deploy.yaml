@@ -83,9 +83,8 @@ jobs:
               
               echo ${{ secrets.SSH_KEY }} > /tmp/id_rsa
               chmod 400 /tmp/id_rsa
-              scp -v -i /tmp/id_rsa prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
-              scp -v -i /tmp/id_rsa migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
-              scp -v -i /tmp/id_rsa migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+              scp -i /tmp/id_rsa prod.docker-compose.yml migration_prod.Dockerfile \ 
+              && migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             
               docker compose --env-file .env.prod -f prod.docker-compose.yaml up
             fi
