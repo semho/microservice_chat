@@ -82,10 +82,18 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - name: Print working directory
-        run: pwd
+      - name: Save artifacts directory
+        run: |
+          ARTIFACTS_DIR="/home/runner/work/microservice_chat"
+          echo "Artifacts directory: $ARTIFACTS_DIR"
       - name: List artifacts
         run: ls -la
+      - name: Check if docker-compose.yml exists
+        run: |
+          if [ ! -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
+            echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден в скачанных артефактах!"
+            exit 1
+          fi
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -94,9 +102,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |              
-            if [ -f "docker_compose/prod.docker-compose.yml" ]; then
+            if [ -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
               echo "Файл docker_compose/prod.docker-compose.yml найден!"
-              scp -i key docker_compose/prod.docker-compose.yml root@31.129.51.22:
             else
               echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден!"
               exit 1
