@@ -87,7 +87,7 @@ jobs:
           ARTIFACTS_DIR="/home/runner/work/microservice_chat"
           echo "Artifacts directory: $ARTIFACTS_DIR"
       - name: List artifacts
-        run: ls -la
+        run: ls -la "$ARTIFACTS_DIR/docker_compose
       - name: Check if docker-compose.yml exists
         run: |
           if [ ! -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
