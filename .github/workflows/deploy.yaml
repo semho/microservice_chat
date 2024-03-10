@@ -20,6 +20,8 @@ jobs:
   create_artifact:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout files
+        uses: actions/checkout@v3
       - name: upload artifact docker-compose
         uses: actions/upload-artifact@v4
         with:
@@ -27,6 +29,7 @@ jobs:
           path: prod.docker-compose.yaml
           retention-days: 1
           if-no-files-found: error
+          overwrite: true
       - name: upload artifact migration Dockerfile
         uses: actions/upload-artifact@v4
         with:
@@ -34,6 +37,7 @@ jobs:
           path: migration_prod.Dockerfile
           retention-days: 1
           if-no-files-found: error
+          overwrite: true
       - name: upload artifact migration_prod.sh
         uses: actions/upload-artifact@v4
         with:
@@ -41,6 +45,7 @@ jobs:
           path: migration_prod.sh
           retention-days: 1
           if-no-files-found: error
+          overwrite: true
 
   build-and-push:
     runs-on: ubuntu-latest
