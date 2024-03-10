@@ -82,13 +82,6 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - name: Create SSH directory and known_hosts file
-        run: |
-          mkdir -p ~/.ssh
-          touch ~/.ssh/known_hosts
-      - name: Add server key to known_hosts
-        run: |
-          echo "${{ secrets.SERVER_PUBLIC_KEY }}" >> ~/.ssh/known_hosts
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -121,7 +114,7 @@ jobs:
               ls -la
               
               mkdir -p ~/.ssh
-              echo ${{ secrets.SSH_KEY }} >> ~/.ssh/id_rsa
+              echo "${{ secrets.SSH_KEY }}" >> ~/.ssh/id_rsa
               chmod 600 ~/.ssh/id_rsa
               scp -v -i ~/.ssh/id_rsa prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh root@31.129.51.22:
             fi
