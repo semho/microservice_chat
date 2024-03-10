@@ -82,15 +82,13 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - name: Save artifacts directory
-        run: |
-          ARTIFACTS_DIR="/home/runner/work/microservice_chat"
-          echo "Artifacts directory: $ARTIFACTS_DIR"
+      - name: Current dir
+        run: pwd
       - name: List artifacts
-        run: ls -la "$ARTIFACTS_DIR/docker_compose"
+        run: ls -la 
       - name: Check if docker-compose.yml exists
         run: |
-          if [ ! -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
+          if [ ! -f "docker_compose/prod.docker-compose.yml" ]; then
             echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден в скачанных артефактах!"
             exit 1
           fi
