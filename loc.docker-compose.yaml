@@ -31,3 +31,19 @@ services:
     depends_on:
       - pg-auth-local
       - pg-chat-server-local
+
+  auth-local:
+    build:
+      context: .
+      dockerfile: auth.Dockerfile
+    command: -config-path=.env.local
+    depends_on:
+      - pg-auth-local
+
+  chat-server-local:
+    build:
+      context: .
+      dockerfile: chat-server.Dockerfile
+    command: -config-path=.env.local
+    depends_on:
+      - pg-chat-server-local
