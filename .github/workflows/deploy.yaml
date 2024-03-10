@@ -87,7 +87,7 @@ jobs:
           ARTIFACTS_DIR="/home/runner/work/microservice_chat"
           echo "Artifacts directory: $ARTIFACTS_DIR"
       - name: List artifacts
-        run: ls -la "$ARTIFACTS_DIR/docker_compose
+        run: ls -la "$ARTIFACTS_DIR/docker_compose"
       - name: Check if docker-compose.yml exists
         run: |
           if [ ! -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
@@ -101,11 +101,22 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
-          script: |              
-            if [ -f "$ARTIFACTS_DIR/docker_compose/prod.docker-compose.yml" ]; then
-              echo "Файл docker_compose/prod.docker-compose.yml найден!"
+          script: |
+            if [ -f "docker-compose.yaml" ]; then
+              echo "Docker Compose уже запущен, выполняем развертывание"
+              # Stop running containers
+              docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
+              
+              # Remove old containers
+              docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
+              
+              # Run a new containers from a new image
+              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
             else
-              echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден!"
-              exit 1
+              echo "Docker Compose не запущен, запускаем его и выполняем развертывание"
+              # Запускаем Docker Compose и выполняем шаги развертывания        
+              docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+              scp -v -i key prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             fi
-            
