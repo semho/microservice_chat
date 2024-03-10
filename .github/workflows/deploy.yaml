@@ -1,0 +1,82 @@
+name: Deploy Workflow
+
+on:
+  workflow_run:
+    workflows: ["Go Tests"]
+    types:
+      - completed
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  REGISTRY: ${{ secrets.REGISTRY }}
+  IMAGE_NAME_1: "auth"
+  IMAGE_NAME_2: "chat-server"
+  CONTAINER_NAME_1: "auth-prod"
+  CONTAINER_NAME_2: "chat-server-prod"
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v3
+
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      - name: Build and Push Docker Image 1
+        run: |
+          TAG_NAME_1=$(echo $GITHUB_SHA | head -c7)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1 -f auth.Dockerfile .
+
+      - name: Build and Push Docker Image 2
+        run: |
+          TAG_NAME_2=$(echo $GITHUB_SHA | head -c7)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2 -f chat-server.Dockerfile .
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Deploy to Selectel Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
+          scripts: |
+            # Set up variables
+            TAG_NAME1=$(echo $GITHUB_SHA | head -c7)
+            TAG_NAME2=$(echo $GITHUB_SHA | head -c7)
+            
+            # Login into Selectel Registry
+            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+            
+            # Stop running containers
+            docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
+            
+            # Remove old containers
+            docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
+            
+            # Check if Docker Compose is running
+            if docker ps | grep -q $CONTAINER_NAME_1; then
+              echo "Docker Compose уже запущен, выполняем развертывание"
+              # Run a new containers from a new image
+              docker-compose up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker-compose up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+            else
+              echo "Docker Compose не запущен, запускаем его и выполняем развертывание"
+              # Запускаем Docker Compose и выполняем шаги развертывания        
+              docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
+              docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+              docker compose --env-file .env.prod -f prod.docker-compose.yaml up --build

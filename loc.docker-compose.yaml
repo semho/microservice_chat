@@ -33,6 +33,7 @@ services:
       - pg-chat-server-local
 
   auth-local:
+    container_name: auth-local
     build:
       context: .
       dockerfile: auth.Dockerfile
@@ -41,6 +42,7 @@ services:
       - pg-auth-local
 
   chat-server-local:
+    container_name: chat-server-local
     build:
       context: .
       dockerfile: chat-server.Dockerfile
