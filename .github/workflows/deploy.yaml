@@ -47,6 +47,10 @@ jobs:
     needs: build-and-push
 
     steps:
+      - name: Set error handling
+        run: set -e
+      - name: Docker Login
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -59,18 +63,15 @@ jobs:
             TAG_NAME1=$(echo $GITHUB_SHA | head -c7)
             TAG_NAME2=$(echo $GITHUB_SHA | head -c7)
             
-            # Login into Selectel Registry
-            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
-            
-            # Stop running containers
-            docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
-            
-            # Remove old containers
-            docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
-            
-            # Check if Docker Compose is running
-            if docker ps | grep -q $CONTAINER_NAME_1; then
+            # Check if Docker Compose is exist
+            if [ -f "docker-compose.yaml" ]; then
               echo "Docker Compose уже запущен, выполняем развертывание"
+              # Stop running containers
+              docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
+              
+              # Remove old containers
+              docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
+            
               # Run a new containers from a new image
               docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker-compose --env-file .env.prod up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
@@ -80,8 +81,10 @@ jobs:
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
               
-              scp prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/docker-compose.yml
-              scp migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/migration_prod.Dockerfile
-              scp migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/migration_prod.sh
+              echo ${{ secrets.SSH_KEY }} > /tmp/id_rsa
+              chmod 400 /tmp/id_rsa
+              scp -i -v /tmp/id_rsa prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/docker-compose.yml
+              scp -i -v /tmp/id_rsa migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/migration_prod.Dockerfile
+              scp -i -v /tmp/id_rsa migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:/home/root/migration_prod.sh
             
-              docker compose --env-file .env.prod up --build
+              docker compose --env-file .env.prod up
