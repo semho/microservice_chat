@@ -111,12 +111,8 @@ jobs:
               # Запускаем Docker Compose и выполняем шаги развертывания        
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
-              
-              # Передаем файлы на сервер
-              curl -L ${{ github.workflow_artifacts_url }} | tar -xzv -C artifacts
-              scp -v -i key artifacts/prod.docker-compose.yml artifacts/migration_prod.Dockerfile artifacts/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             
               ls -la
               
-          
+              scp -v -i key prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             fi
