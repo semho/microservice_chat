@@ -100,6 +100,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |
+            ls -la $RUNNER_DIR/docker_compose/
+            my_key=$(echo key | head -c7)
+            echo $my_key
             scp $RUNNER_DIR/docker_compose/prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            ls -la $RUNNER_DIR/dockerfile/
             scp $RUNNER_DIR/dockerfile/migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            ls -la $RUNNER_DIR/migration/
             scp $RUNNER_DIR/migration/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
