@@ -83,21 +83,15 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-      - name: Current dir
-        run: pwd
-      - name: List artifacts
-        run: ls -la
-      - name: List dir
+      - name: List RUNNER_DIR
         run: ls -la $RUNNER_DIR
-      - name: List dir compose
-        run: ls -la $RUNNER_DIR/docker_compose/
       - name: Check if docker-compose.yml exists
         run: |
-          if [ ! -f "$RUNNER_DIR/docker_compose/prod.docker-compose.yaml" ]; then
-            echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден в скачанных артефактах!"
+          if [ ! -f $RUNNER_DIR/docker_compose/prod.docker-compose.yaml ]; then
+            echo "Ошибка: Файл docker_compose/prod.docker-compose.yaml не найден в скачанных артефактах!"
             exit 1
           fi
-          ls -la "$DIR/docker_compose/"
+          ls -la "$RUNNER_DIR/docker_compose/"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
