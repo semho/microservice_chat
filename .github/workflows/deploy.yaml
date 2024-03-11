@@ -100,6 +100,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |
+            ls -la $RUNNER_DIR
             cd $RUNNER_DIR/docker-compose/
             ls -la
             scp prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
