@@ -98,9 +98,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
+          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA, RUNNER_DIR
           script: |
-            ls -la /home/runner/work/microservice_chat/
+            ls -la $RUNNER_DIR
             cd $RUNNER_DIR/docker-compose/
             ls -la
             scp prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
