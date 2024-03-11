@@ -101,10 +101,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          source: |
-            $RUNNER_DIR/docker_compose/prod.docker-compose.yml
-            $RUNNER_DIR/dockerfile/migration_prod.Dockerfile
-            $RUNNER_DIR/migration/migration_prod.sh
+          source: "${RUNNER_DIR}/docker_compose/prod.docker-compose.yml,
+                  ${RUNNER_DIR}/dockerfile/migration_prod.Dockerfile,
+                  ${RUNNER_DIR}/migration/migration_prod.sh"
           target: "~"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
