@@ -90,7 +90,7 @@ jobs:
       - name: List artifacts
         run: ls -la
       - name: List dir
-        run: ls -la /home/runner/work/microservice_chat/microservice_chat
+        run: ls -la $DIR
       - name: List dir compose
         run: ls -la /home/runner/work/microservice_chat/microservice_chat/docker_compose/
       - name: Check if docker-compose.yml exists
