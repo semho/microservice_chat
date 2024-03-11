@@ -87,11 +87,11 @@ jobs:
         run: ls -la $RUNNER_DIR
       - name: Check if docker-compose.yml exists
         run: |
+          ls -la "$RUNNER_DIR/docker_compose/"
           if [ ! -f $RUNNER_DIR/docker_compose/prod.docker-compose.yaml ]; then
             echo "Ошибка: Файл docker_compose/prod.docker-compose.yaml не найден в скачанных артефактах!"
             exit 1
           fi
-          ls -la "$RUNNER_DIR/docker_compose/"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -100,6 +100,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |
+            scp -i key $RUNNER_DIR/docker_compose/prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            scp -i key $RUNNER_DIR/dockerfile/migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            scp -i key $RUNNER_DIR/migration/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             if [ -f "docker-compose.yaml" ]; then
               echo "Docker Compose уже запущен, выполняем развертывание"
               # Stop running containers
@@ -116,5 +119,4 @@ jobs:
               # Запускаем Docker Compose и выполняем шаги развертывания        
               docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
               docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
-              scp -v -i key prod.docker-compose.yml migration_prod.Dockerfile migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
             fi
