@@ -90,7 +90,7 @@ jobs:
       - name: Сheck files before copying
         run: |
          ls -la "/home/runner/work/microservice_chat/microservice_chat/docker_compose/"
-         cat "/home/runner/work/microservice_chat/microservice_chat/docker_compose/prod.docker-compose.yml"
+         cat "/home/runner/work/microservice_chat/microservice_chat/docker_compose/prod.docker-compose.yaml"
          cat "/home/runner/work/microservice_chat/microservice_chat/dockerfile/migration_prod.Dockerfile"
          cat "/home/runner/work/microservice_chat/microservice_chat/migration/migration_prod.sh"
 
@@ -108,7 +108,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          source: "/home/runner/work/microservice_chat/microservice_chat/docker_compose/prod.docker-compose.yml,
+          source: "/home/runner/work/microservice_chat/microservice_chat/docker_compose/prod.docker-compose.yaml,
                   /home/runner/work/microservice_chat/microservice_chat/dockerfile/migration_prod.Dockerfile,
                   /home/runner/work/microservice_chat/microservice_chat/migration/migration_prod.sh"
           target: "~"
