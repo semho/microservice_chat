@@ -94,15 +94,24 @@ jobs:
             echo "Ошибка: Файл docker_compose/prod.docker-compose.yaml не найден в скачанных артефактах!"
             exit 1
           fi
+      - name: Сopy file via ssh password
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: |
+            $RUNNER_DIR/docker_compose/prod.docker-compose.yml
+            $RUNNER_DIR/dockerfile/migration_prod.Dockerfile
+            $RUNNER_DIR/migration/migration_prod.sh
+          target: "~"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA, RUNNER_DIR
+          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |
             ls -la ${{ runner.workspace }}
-            cd $RUNNER_DIR/docker-compose/
-            ls -la
-            scp prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
