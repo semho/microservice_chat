@@ -100,23 +100,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
           script: |
-            scp -i key $RUNNER_DIR/docker_compose/prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
-            scp -i key $RUNNER_DIR/dockerfile/migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
-            scp -i key $RUNNER_DIR/migration/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
-            if [ -f "docker-compose.yaml" ]; then
-              echo "Docker Compose уже запущен, выполняем развертывание"
-              # Stop running containers
-              docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
-              
-              # Remove old containers
-              docker-compose rm $CONTAINER_NAME_1, $CONTAINER_NAME_2
-              
-              # Run a new containers from a new image
-              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_1 -t $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
-              docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d --name $CONTAINER_NAME_2 -t $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
-            else
-              echo "Docker Compose не запущен, запускаем его и выполняем развертывание"
-              # Запускаем Docker Compose и выполняем шаги развертывания        
-              docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
-              docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
-            fi
+            scp $RUNNER_DIR/docker_compose/prod.docker-compose.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            scp $RUNNER_DIR/dockerfile/migration_prod.Dockerfile ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
+            scp $RUNNER_DIR/migration/migration_prod.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_HOST }}:
