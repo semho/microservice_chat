@@ -16,7 +16,7 @@ env:
   IMAGE_NAME_2: "chat-server"
   CONTAINER_NAME_1: "auth-prod"
   CONTAINER_NAME_2: "chat-server-prod"
-  DIR: "/home/runner/work/microservice_chat/"
+  RUNNER_DIR: "/home/runner/work/microservice_chat/microservice_chat"
 jobs:
   create_artifact:
     runs-on: ubuntu-latest
@@ -83,19 +83,17 @@ jobs:
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v4
-        with:
-          path: $DIR
       - name: Current dir
         run: pwd
       - name: List artifacts
         run: ls -la
       - name: List dir
-        run: ls -la $DIR/microservice_chat
+        run: ls -la $RUNNER_DIR
       - name: List dir compose
-        run: ls -la /home/runner/work/microservice_chat/microservice_chat/docker_compose/
+        run: ls -la $RUNNER_DIR/docker_compose/
       - name: Check if docker-compose.yml exists
         run: |
-          if [ ! -f "$DIR/docker_compose/prod.docker-compose.yaml" ]; then
+          if [ ! -f "$RUNNER_DIR/docker_compose/prod.docker-compose.yaml" ]; then
             echo "Ошибка: Файл docker_compose/prod.docker-compose.yml не найден в скачанных артефактах!"
             exit 1
           fi
