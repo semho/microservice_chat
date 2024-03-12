@@ -108,8 +108,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          source: "/home/runner/work/microservice_chat/microservice_chat/docker_compose/prod.docker-compose.yaml,
-                  /home/runner/work/microservice_chat/microservice_chat/dockerfile/migration_prod.Dockerfile,
+          source: "/home/runner/work/microservice_chat/microservice_chat/dockerfile/migration_prod.Dockerfile,
                   /home/runner/work/microservice_chat/microservice_chat/migration/migration_prod.sh"
           target: "~/"
       - name: Deploy to Selectel Cloud via SSH action
