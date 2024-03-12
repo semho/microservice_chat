@@ -19,7 +19,6 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    needs: create_artifact
     steps:
       - name: Checkout master
         uses: actions/checkout@v3
