@@ -109,7 +109,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "/home/runner/work/microservice_chat/microservice_chat/*"
+          source: "./"
           target: "/root"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
