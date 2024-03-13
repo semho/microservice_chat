@@ -57,6 +57,6 @@ jobs:
       - name: Pull and rename Docker Image
         run: |
           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
-          if docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
-          if docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
+          docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
+          docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
           docker images
