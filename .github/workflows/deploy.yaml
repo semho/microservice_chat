@@ -63,26 +63,14 @@ jobs:
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA, TAG_NAME
           script: |
             docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
-
-            if docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME; then
-              if docker images "$IMAGE_NAME_1" | grep -q "$IMAGE_NAME_1"; then
-                docker image rm "$IMAGE_NAME_1" || true
-                docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $IMAGE_NAME_1
-              fi
-            else
-              echo "Не удалось скачать образ с тегом $TAG_NAME."
-            fi
-  
-            if docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME; then
-              if docker images "$IMAGE_NAME_2" | grep -q "$IMAGE_NAME_2"; then
-                docker image rm "$IMAGE_NAME_2" || true
-                docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $IMAGE_NAME_2
-              fi
-            else
-              echo "Не удалось скачать образ с тегом $TAG_NAME."
-            fi
-
-            docker images
+            docker image rm "$IMAGE_NAME_1" || true
+            docker image rm "$IMAGE_NAME_2" || true
+            
+            docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
+            docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
+            
+            docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $IMAGE_NAME_1
+            docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $IMAGE_NAME_2
             
             if docker ps -f "name=auth-prod" | grep -q "auth-prod"; then
               echo "Docker Compose уже запущен, выполняем развертывание"
