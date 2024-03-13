@@ -16,7 +16,7 @@ env:
   IMAGE_NAME_2: "chat-server"
   CONTAINER_NAME_1: "auth-prod"
   CONTAINER_NAME_2: "chat-server-prod"
-  TAG_NAME: ${{ github.sha | head -c7 }}
+  TAG_NAME: ${{ github.sha }}
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
