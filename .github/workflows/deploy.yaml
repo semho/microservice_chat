@@ -16,6 +16,7 @@ env:
   IMAGE_NAME_2: "chat-server"
   CONTAINER_NAME_1: "auth-prod"
   CONTAINER_NAME_2: "chat-server-prod"
+  TAG_NAME: ${{ github.sha | head -c7 }}
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -31,15 +32,13 @@ jobs:
 
       - name: Build and Push Docker Image 1
         run: |
-          TAG_NAME_1=$(echo $GITHUB_SHA | head -c7)
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1 -f auth.Dockerfile .
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile .
 
       - name: Build and Push Docker Image 2
         run: |
-          TAG_NAME_2=$(echo $GITHUB_SHA | head -c7)
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2 -f chat-server.Dockerfile .
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME -f chat-server.Dockerfile .
 
   deploy:
     runs-on: ubuntu-latest
@@ -67,14 +66,10 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA
+          envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA, TAG_NAME
           script: |
-            # Set up variables
-            TAG_NAME1=$(echo $GITHUB_SHA | head -c7)
-            TAG_NAME2=$(echo $GITHUB_SHA | head -c7)
-            
-            docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME_1
-            docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME_2
+            docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
+            docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
             
             if docker ps -f "name=auth-prod" | grep -q "auth-prod"; then
               echo "Docker Compose уже запущен, выполняем развертывание"
