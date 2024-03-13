@@ -54,7 +54,7 @@ jobs:
           port: 22
           source: "./migration_prod.Dockerfile, migration_prod.sh, migrations, prod.docker-compose.yaml"
           target: "/root"
-      - name: Pull and rename Docker Image 1
+      - name: Pull and rename Docker Image
         run: |
           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
           
@@ -62,6 +62,11 @@ jobs:
             if docker images "$REGISTRY/$IMAGE_NAME_1" | grep -q "$REGISTRY/$IMAGE_NAME_1"; then
               docker image rm "$REGISTRY/$IMAGE_NAME_1" || true
               docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $REGISTRY/$IMAGE_NAME_1
+              if docker images "$REGISTRY/$IMAGE_NAME_1" | grep -q "$REGISTRY/$IMAGE_NAME_1"; then
+                echo "Образ $REGISTRY/$IMAGE_NAME_1 успешно переименован."
+              else
+                echo "Не удалось переименовать образ $REGISTRY/$IMAGE_NAME_1."
+              fi
             fi
           else
             echo "Не удалось скачать образ с тегом $TAG_NAME."
@@ -71,6 +76,11 @@ jobs:
             if docker images "$REGISTRY/$IMAGE_NAME_2" | grep -q "$REGISTRY/$IMAGE_NAME_2"; then
               docker image rm "$REGISTRY/$IMAGE_NAME_2" || true
               docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $REGISTRY/$IMAGE_NAME_2
+              if docker images "$REGISTRY/$IMAGE_NAME_2" | grep -q "$REGISTRY/$IMAGE_NAME_2"; then
+                echo "Образ $REGISTRY/$IMAGE_NAME_2 успешно переименован."
+              else
+                echo "Не удалось переименовать образ $REGISTRY/$IMAGE_NAME_2."
+              fi
             fi
           else
             echo "Не удалось скачать образ с тегом $TAG_NAME."
