@@ -54,6 +54,27 @@ jobs:
           port: 22
           source: "./migration_prod.Dockerfile, migration_prod.sh, migrations, prod.docker-compose.yaml"
           target: "/root"
+      - name: Pull and rename Docker Image 1
+        run: |
+          docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+          
+          if docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME; then
+            if docker images "$REGISTRY/$IMAGE_NAME_1" | grep -q "$REGISTRY/$IMAGE_NAME_1"; then
+              docker image rm "$REGISTRY/$IMAGE_NAME_1" || true
+              docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $REGISTRY/$IMAGE_NAME_1
+            fi
+          else
+            echo "Не удалось скачать образ с тегом $TAG_NAME."
+          fi
+          
+          if docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME; then
+            if docker images "$REGISTRY/$IMAGE_NAME_2" | grep -q "$REGISTRY/$IMAGE_NAME_2"; then
+              docker image rm "$REGISTRY/$IMAGE_NAME_2" || true
+              docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $REGISTRY/$IMAGE_NAME_2
+            fi
+          else
+            echo "Не удалось скачать образ с тегом $TAG_NAME."
+          fi
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -61,11 +82,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           envs: IMAGE_NAME_1, IMAGE_NAME_2, CONTAINER_NAME_1, CONTAINER_NAME_2, REGISTRY, GITHUB_SHA, TAG_NAME
-          script: |
-            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
-            docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
-            docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
-            
+          script: |            
             if docker ps -f "name=auth-prod" | grep -q "auth-prod"; then
               echo "Docker Compose уже запущен, выполняем развертывание"
             
