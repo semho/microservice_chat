@@ -65,18 +65,18 @@ jobs:
             docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
 
             if docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME; then
-              if docker images "$REGISTRY/$IMAGE_NAME_1" | grep -q "$REGISTRY/$IMAGE_NAME_1"; then
-                docker image rm "$REGISTRY/$IMAGE_NAME_1" || true
-                docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $REGISTRY/$IMAGE_NAME_1
+              if docker images "$IMAGE_NAME_1" | grep -q "$IMAGE_NAME_1"; then
+                docker image rm "$IMAGE_NAME_1" || true
+                docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $IMAGE_NAME_1
               fi
             else
               echo "Не удалось скачать образ с тегом $TAG_NAME."
             fi
   
             if docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME; then
-              if docker images "$REGISTRY/$IMAGE_NAME_2" | grep -q "$REGISTRY/$IMAGE_NAME_2"; then
-                docker image rm "$REGISTRY/$IMAGE_NAME_2" || true
-                docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $REGISTRY/$IMAGE_NAME_2
+              if docker images "$IMAGE_NAME_2" | grep -q "$IMAGE_NAME_2"; then
+                docker image rm "$IMAGE_NAME_2" || true
+                docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $IMAGE_NAME_2
               fi
             else
               echo "Не удалось скачать образ с тегом $TAG_NAME."
@@ -92,7 +92,6 @@ jobs:
             fi
             sleep 5
             docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d
-      - name: Clean Docker Containers
-        run: docker container prune -f
-      - name: Clean Docker Images
-        run: docker image prune -f
+            
+            docker container prune -f
+            docker image prune -f
