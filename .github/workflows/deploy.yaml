@@ -83,7 +83,7 @@ jobs:
               docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
             fi
             sleep 5
-            docker compose --env-file .env.prod -f prod.docker-compose.yaml up -d
+            docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d
       - name: Clean Docker Containers
         run: docker container prune -f
       - name: Clean Docker Images
