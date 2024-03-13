@@ -57,10 +57,26 @@ jobs:
       - name: Pull and rename Docker Image
         run: |
           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
-          docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
-          docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
-          docker images 
-
+          
+          if docker pull $REGISTRY/$IMAGE_NAME_1:$TAG_NAME; then
+            if docker images "$REGISTRY/$IMAGE_NAME_1:latest" | grep -q "$REGISTRY/$IMAGE_NAME_1:latest"; then
+              docker image rm "$REGISTRY/$IMAGE_NAME_1:latest" || true
+              docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $REGISTRY/$IMAGE_NAME_1:latest
+            fi
+          else
+            echo "Не удалось скачать образ с тегом $TAG_NAME."
+          fi
+          
+          if docker pull $REGISTRY/$IMAGE_NAME_2:$TAG_NAME; then
+            if docker images "$REGISTRY/$IMAGE_NAME_2:latest" | grep -q "$REGISTRY/$IMAGE_NAME_2:latest"; then
+              docker image rm "$REGISTRY/$IMAGE_NAME_2:latest" || true
+              docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $REGISTRY/$IMAGE_NAME_2:latest
+            fi
+          else
+            echo "Не удалось скачать образ с тегом $TAG_NAME."
+          fi
+          
+          docker images
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
