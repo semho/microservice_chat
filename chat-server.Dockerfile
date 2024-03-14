@@ -15,4 +15,4 @@ FROM alpine:3.19.1
 WORKDIR /root/
 COPY --from=builder /github.com/semho/microservice_chat/chat-server/bin/chat_server .
 
-CMD ["./chat_server", "-config-path", ".env"]
+ENTRYPOINT ["./chat_server"]

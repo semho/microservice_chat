@@ -15,4 +15,4 @@ FROM alpine:3.19.1
 WORKDIR /root/
 COPY --from=builder /github.com/semho/microservice_chat/auth/bin/auth_server .
 
-CMD ["./auth_server", "-config-path", ".env"]
+ENTRYPOINT ["./auth_server"]
