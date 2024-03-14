@@ -1,11 +1,11 @@
-ARG ENV_FILE
+ARG ENV_FILE_CONTENTS
 FROM golang:1.21.8-alpine AS builder
 
 COPY ./auth /github.com/semho/microservice_chat/auth
 WORKDIR /github.com/semho/microservice_chat/auth
 
 # Создаем .env файл на основе переменной окружения ENV_FILE_CONTENTS
-RUN echo "$ENV_FILE" > auth.env
+RUN echo "$ENV_FILE_CONTENTS" > auth.env
 # Проверяем содержимое файла .env
 RUN cat auth.env
 

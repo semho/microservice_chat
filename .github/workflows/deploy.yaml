@@ -32,7 +32,7 @@ jobs:
       - name: Build and Push Docker Image 1
         run: |
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile --build-arg ENV_FILE=ENV_FILE_CONTENTS .
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile --build-arg ENV_FILE_CONTENTS="${{ secrets.ENV_FILE_CONTENTS }}" .
 #      - name: Create .env file for second image
 #        run: echo "$ENV_FILE_CONTENTS" > chat-server.env
 #      - name: Build and Push Docker Image 2
