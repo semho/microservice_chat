@@ -32,11 +32,11 @@ jobs:
       - name: Build and Push Docker Image 1
         run: |
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile --build-arg ENV_FILE=ENV_FILE_CONTENTS .
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile --build-arg ENV_FILE=$ENV_FILE_CONTENTS .
       - name: Build and Push Docker Image 2
         run: |
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME -f chat-server.Dockerfile --build-arg ENV_FILE=ENV_FILE_CONTENTS .
+          docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME -f chat-server.Dockerfile --build-arg ENV_FILE=$ENV_FILE_CONTENTS .
 
   deploy:
     runs-on: ubuntu-latest
