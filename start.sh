@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker compose --env-file .env.prod -f prod.docker-compose.yaml up --build
+docker compose --env-file .env up --build
 
 #docker build -t <img> -f <name>.Dockerfile .
 #go run <img> -config-path=.env.local

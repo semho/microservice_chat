@@ -5,43 +5,43 @@ volumes:
   pg_vol_chat-server:
 
 services:
-  pg-auth-prod:
+  pg-auth:
     image: postgres:16-alpine
     env_file:
-      - ./.env.prod
+      - ./.env
     ports:
       - "54321:5432"
     volumes:
       - pg_vol_auth:/var/lib/postgresql/data
 
-  pg-chat-server-prod:
+  pg-chat-server:
     image: postgres:16-alpine
     env_file:
-      - ./.env.prod
+      - ./.env
     ports:
       - "54322:5432"
     volumes:
       - pg_vol_chat-server:/var/lib/postgresql/data
 
-  migrator-prod:
+  migrator:
     build:
       context: .
-      dockerfile: migration_prod.Dockerfile
+      dockerfile: migration.Dockerfile
     restart: on-failure
     depends_on:
-      - pg-auth-prod
-      - pg-chat-server-prod
+      - pg-auth
+      - pg-chat-server
 
-  auth-prod:
-    container_name: auth-prod
+  auth:
+    container_name: auth
     image: auth
-    command: -config-path=.env.prod
+    command: -config-path=.env
     depends_on:
-      - pg-auth-prod
+      - pg-auth
 
-  chat-server-prod:
-    container_name: chat-server-prod
+  chat-server:
+    container_name: chat-server
     image: chat-server
-    command: -config-path=.env.prod
+    command: -config-path=.env
     depends_on:
-      - pg-chat-server-prod
+      - pg-chat-server

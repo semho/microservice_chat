@@ -14,8 +14,8 @@ env:
   REGISTRY: ${{ secrets.REGISTRY }}
   IMAGE_NAME_1: "auth"
   IMAGE_NAME_2: "chat-server"
-  CONTAINER_NAME_1: "auth-prod"
-  CONTAINER_NAME_2: "chat-server-prod"
+  CONTAINER_NAME_1: "auth"
+  CONTAINER_NAME_2: "chat-server"
   TAG_NAME: ${{ github.sha }}
 jobs:
   build-and-push:
@@ -52,7 +52,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "./migration_prod.Dockerfile, migration_prod.sh, migrations, prod.docker-compose.yaml"
+          source: "./migration.Dockerfile, migration.sh, migrations, docker-compose.yaml"
           target: "/root"
       - name: Deploy to Selectel Cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
@@ -72,14 +72,11 @@ jobs:
             docker tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME $IMAGE_NAME_1
             docker tag $REGISTRY/$IMAGE_NAME_2:$TAG_NAME $IMAGE_NAME_2
             
-            if docker ps -f "name=auth-prod" | grep -q "auth-prod"; then
-              echo "Docker Compose уже запущен, выполняем развертывание"
+            docker image rm $REGISTRY/$IMAGE_NAME_1:$TAG_NAME
+            docker image rm $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
             
-              # Stop running containers
-              docker-compose down $CONTAINER_NAME_1, $CONTAINER_NAME_2
-            fi
             sleep 5
-            docker-compose --env-file .env.prod -f prod.docker-compose.yaml up -d
+            docker-compose --env-file .env up -d
             
             docker container prune -f
             docker image prune -f
