@@ -66,10 +66,10 @@ copy-to-server:
 
 docker-build-and-push-auth:
 	docker buildx build --no-cache --platform linux/amd64 -t $(REGESTRY)/auth:v0.0.1 -f auth.Dockerfile .
-	docker login -u $(USERNAME) -p $(PASSWORD) $(REGESTRY)
+	docker login -u $(USERNAME) -p $(PASSWORD)
 	docker push $(REGESTRY)/auth:v0.0.1
 
 docker-build-and-push-chat-server:
 	docker buildx build --no-cache --platform linux/amd64 -t $(REGESTRY)/chat-server:v0.0.1 -f chat-server.Dockerfile .
-	docker login -u $(USERNAME) -p $(PASSWORD) $(REGESTRY)
+	docker login -u $(USERNAME) -p $(PASSWORD)
 	docker push $(REGESTRY)/chat-server:v0.0.1
