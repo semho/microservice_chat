@@ -10,6 +10,8 @@ RUN go mod download
 RUN go build -o ./bin/auth_server cmd/server/main.go
 
 FROM alpine:3.19.1
+# Проверяем содержимое Переменной ENV_FILE
+RUN cat $ENV_FILE
 
 WORKDIR /root/
 COPY --from=builder /github.com/semho/microservice_chat/auth/bin/auth_server .
