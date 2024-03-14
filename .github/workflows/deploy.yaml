@@ -33,8 +33,6 @@ jobs:
         run: echo "$ENV_FILE_CONTENTS" > auth.env
       - name: Build and Push Docker Image 1
         run: |
-          echo "${{ secrets.ENV_FILE_CONTENTS }}"
-          cat auth.env
           docker buildx create --use
           docker buildx build --no-cache --push --tag $REGISTRY/$IMAGE_NAME_1:$TAG_NAME -f auth.Dockerfile --build-arg ENV_FILE=auth.env .
 #      - name: Create .env file for second image
