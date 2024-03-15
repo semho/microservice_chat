@@ -21,8 +21,6 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    env:
-      ENV_FILE_CONTENTS: ${{ secrets.ENV_FILE_CONTENTS }}
     steps:
       - name: Checkout master
         uses: actions/checkout@v3
@@ -91,7 +89,7 @@ jobs:
             docker image rm $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
 
             sleep 5
-            docker-compose --env-file .env up -d
+            docker-compose up -d
 
             docker container prune -f
             docker image prune -f

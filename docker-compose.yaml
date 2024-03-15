@@ -10,10 +10,14 @@ services:
     image: postgres:16-alpine
     env_file:
       - ./.env
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE_AUTH}
     ports:
       - "${PG_PORT_AUTH}:5432"
     volumes:
-      - pg_vol_auth:/var/lib/postgresql/data
+      - pg_vol_auth:/var/lib/postgresql/auth_data
     networks:
       - my-network
 
@@ -22,10 +26,14 @@ services:
     image: postgres:16-alpine
     env_file:
       - ./.env
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE_CHAT_SERVER}
     ports:
       - "${PG_PORT_CHAT_SERVER}:5432"
     volumes:
-      - pg_vol_chat-server:/var/lib/postgresql/data
+      - pg_vol_chat-server:/var/lib/postgresql/chat_data
     networks:
       - my-network
 
@@ -45,7 +53,7 @@ services:
     image: auth
     command: -config-path=.env
     volumes:
-      - ${PROJECT_DIR}.env:/root/.env
+      - /root/.env:/root/.env
     depends_on:
       - pg-auth
     networks:
