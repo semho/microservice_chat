@@ -89,7 +89,7 @@ jobs:
             docker image rm $REGISTRY/$IMAGE_NAME_2:$TAG_NAME
 
             sleep 5
-            docker-compose up -d
+            docker-compose up --build -d
 
             docker container prune -f
             docker image prune -f

@@ -32,7 +32,7 @@ func NewGRPCConfig(portEnvName string) (*grpcConfig, error) {
 
 	return &grpcConfig{
 		host: host,
-		port: "90.156.225.99",
+		port: port,
 	}, nil
 }
 
