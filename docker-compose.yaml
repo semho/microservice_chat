@@ -6,22 +6,28 @@ volumes:
 
 services:
   pg-auth:
+    container_name: pg-auth
     image: postgres:16-alpine
     env_file:
       - ./.env
     ports:
-      - "54321:5432"
+      - "${PG_PORT_AUTH}:5432"
     volumes:
       - pg_vol_auth:/var/lib/postgresql/data
+    networks:
+      - my-network
 
   pg-chat-server:
+    container_name: pg-chat-server
     image: postgres:16-alpine
     env_file:
       - ./.env
     ports:
-      - "54322:5432"
+      - "${PG_PORT_CHAT_SERVER}:5432"
     volumes:
       - pg_vol_chat-server:/var/lib/postgresql/data
+    networks:
+      - my-network
 
   migrator:
     build:
@@ -31,17 +37,31 @@ services:
     depends_on:
       - pg-auth
       - pg-chat-server
+    networks:
+      - my-network
 
   auth:
     container_name: auth
     image: auth
     command: -config-path=.env
+    volumes:
+      - ${PROJECT_DIR}.env:/root/.env
     depends_on:
       - pg-auth
+    networks:
+      - my-network
 
   chat-server:
     container_name: chat-server
     image: chat-server
     command: -config-path=.env
+    volumes:
+      - /root/.env:/root/.env
     depends_on:
       - pg-chat-server
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
