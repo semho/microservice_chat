@@ -75,7 +75,7 @@ services:
     networks:
       - my-network
     ports:
-      - "${PORT_CHAT_SERVER}:50051"
+      - "${PORT_CHAT_SERVER}:50052"
 
 
 networks:
