@@ -51,24 +51,32 @@ services:
   auth:
     container_name: auth
     image: auth
-    command: -config-path=.env
+    command: ["./entrypoint_auth.sh"]
     volumes:
       - /root/.env:/root/.env
     depends_on:
       - pg-auth
+      - migrator
     networks:
       - my-network
+    ports:
+      - "${PORT_AUTH}:50051"
+
 
   chat-server:
     container_name: chat-server
     image: chat-server
-    command: -config-path=.env
+    command: ["./entrypoint_chat_server.sh"]
     volumes:
       - /root/.env:/root/.env
     depends_on:
       - pg-chat-server
+      - migrator
     networks:
       - my-network
+    ports:
+      - "${PORT_CHAT_SERVER}:50051"
+
 
 networks:
   my-network:

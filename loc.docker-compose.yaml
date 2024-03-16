@@ -38,6 +38,8 @@ services:
       context: .
       dockerfile: auth.Dockerfile
     command: -config-path=.env.local
+    volumes:
+      - ${BASE_DIR}.env:/root/.env
     depends_on:
       - pg-auth-local
 
@@ -47,5 +49,7 @@ services:
       context: .
       dockerfile: chat-server.Dockerfile
     command: -config-path=.env.local
+    volumes:
+      - ${BASE_DIR}.env:/root/.env
     depends_on:
       - pg-chat-server-local

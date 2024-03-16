@@ -10,5 +10,4 @@ FROM alpine:3.19.1
 
 WORKDIR /root/
 COPY --from=builder /github.com/semho/microservice_chat/chat-server/bin/chat_server .
-
-ENTRYPOINT ["./chat_server"]
+COPY entrypoint_chat_server.sh /root/entrypoint_chat_server.sh

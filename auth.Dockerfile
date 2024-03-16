@@ -10,5 +10,4 @@ FROM alpine:3.19.1
 
 WORKDIR /root/
 COPY --from=builder /github.com/semho/microservice_chat/auth/bin/auth_server .
-
-ENTRYPOINT ["./auth_server"]
+COPY entrypoint_auth.sh /root/entrypoint_auth.sh
