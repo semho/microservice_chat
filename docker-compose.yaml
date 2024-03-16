@@ -1,0 +1,83 @@
+version: '3.7'
+
+volumes:
+  pg_vol_auth:
+  pg_vol_chat-server:
+
+services:
+  pg-auth:
+    container_name: pg-auth
+    image: postgres:16-alpine
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE_AUTH}
+    ports:
+      - "${PG_PORT_AUTH}:5432"
+    volumes:
+      - pg_vol_auth:/var/lib/postgresql/auth_data
+    networks:
+      - my-network
+
+  pg-chat-server:
+    container_name: pg-chat-server
+    image: postgres:16-alpine
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=${PG_DATABASE_CHAT_SERVER}
+    ports:
+      - "${PG_PORT_CHAT_SERVER}:5432"
+    volumes:
+      - pg_vol_chat-server:/var/lib/postgresql/chat_data
+    networks:
+      - my-network
+
+  migrator:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    restart: on-failure
+    depends_on:
+      - pg-auth
+      - pg-chat-server
+    networks:
+      - my-network
+
+  auth:
+    container_name: auth
+    image: auth
+    command: ["./entrypoint_auth.sh"]
+    volumes:
+      - /root/.env:/root/.env
+    depends_on:
+      - pg-auth
+      - migrator
+    networks:
+      - my-network
+    ports:
+      - "${PORT_AUTH}:50051"
+
+
+  chat-server:
+    container_name: chat-server
+    image: chat-server
+    command: ["./entrypoint_chat_server.sh"]
+    volumes:
+      - /root/.env:/root/.env
+    depends_on:
+      - pg-chat-server
+      - migrator
+    networks:
+      - my-network
+    ports:
+      - "${PORT_CHAT_SERVER}:50052"
+
+
+networks:
+  my-network:
+    driver: bridge

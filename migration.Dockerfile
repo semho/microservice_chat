@@ -12,9 +12,9 @@ WORKDIR /root
 
 ADD migrations/migrations-auth migrations/migrations-auth
 ADD migrations/migrations-chat-server migrations/migrations-chat-server
-ADD migration_prod.sh .
-ADD .env.prod .
+ADD migration.sh .
+ADD .env .
 
-RUN chmod +x migration_prod.sh
+RUN chmod +x migration.sh
 
-ENTRYPOINT ["bash", "migration_prod.sh"]
+ENTRYPOINT ["bash", "migration.sh"]
